@@ -109,15 +109,31 @@ impl EmailSender {
                     .clone()
                     .unwrap_or_else(|| DEFAULT_FROM_SENDER.to_string())
                     .parse()?,
-            )
-            .to(email.to.parse()?);
+            );
+
+        for addr in email.to.split(',') {
+            let trimmed = addr.trim();
+            if !trimmed.is_empty() {
+                builder = builder.to(trimmed.parse()?);
+            }
+        }
 
         if let Some(bcc) = &email.bcc {
-            builder = builder.bcc(bcc.parse()?);
+            for addr in bcc.split(',') {
+                let trimmed = addr.trim();
+                if !trimmed.is_empty() {
+                    builder = builder.bcc(trimmed.parse()?);
+                }
+            }
         }
 
         if let Some(cc) = &email.cc {
-            builder = builder.cc(cc.parse()?);
+            for addr in cc.split(',') {
+                let trimmed = addr.trim();
+                if !trimmed.is_empty() {
+                    builder = builder.cc(trimmed.parse()?);
+                }
+            }
         }
 
         if let Some(reply_to) = &email.reply_to {
